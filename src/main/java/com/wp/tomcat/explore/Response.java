@@ -10,13 +10,6 @@ import java.io.OutputStream;
  * @Author wangpeng
  * @Date 2019/5/7 15:11
  */
-/*
-HTTP Response = Status-Line
-*(( general-header | response-header | entity-header ) CRLF)
-CRLF
-[ message-body ]
-Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
-*/
 public class Response {
 
     private static final int BUFFER_SIZE = 1024;
@@ -36,7 +29,10 @@ public class Response {
         FileInputStream fis = null;
         try {
             File file = new File(HttpServer.WEB_ROOT, request.getUri());
+            System.out.println(file.getPath());
             if (file.exists()) {
+                String successMessage = "HTTP/1.1 200 OK\r\n" + "Content-Type: text/html\r\n";
+                output.write(successMessage.getBytes());
                 fis = new FileInputStream(file);
                 int ch = fis.read(bytes, 0, BUFFER_SIZE);
                 while (ch != -1) {

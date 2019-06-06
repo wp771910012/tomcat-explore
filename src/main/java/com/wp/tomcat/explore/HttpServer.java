@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import com.wp.tomcat.explore.connector.http.HttpRequest;
+import com.wp.tomcat.explore.connector.http.HttpResponse;
 
 /**
  * @Description
@@ -14,12 +16,6 @@ import java.net.Socket;
  */
 public class HttpServer {
 
-    /**
-     * WEB_ROOT is the directory where our HTML and other files reside. For this package, WEB_ROOT is the "webroot"
-     * directory under the working directory. The working directory is the location in the file system from where the
-     * java command was invoked.
-     */
-    public static final String WEB_ROOT = HttpServer.class.getResource("/").getPath() + "webroot";
     // shutdown command
     private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
     // the shutdown command received
@@ -48,17 +44,25 @@ public class HttpServer {
                 socket = serverSocket.accept();
                 input = socket.getInputStream();
                 output = socket.getOutputStream();
-                // create Request object and parse
-                Request request = new Request(input);
-                request.parse();
-                // create Response object
-                Response response = new Response(output);
-                response.setRequest(request);
-                response.sendStaticResource();
+                // create HttpRequest object and parse
+                HttpRequest httpRequest = new HttpRequest(input);
+                httpRequest.parse();
+                // create HttpResponse object
+                HttpResponse response = new HttpResponse(output);
+                response.setHttpRequest(httpRequest);
+                //区别静态资源请求和servlet请求
+                if (httpRequest.getUri().startsWith("/servlet/")) {
+                    ServletProcessor processor = new ServletProcessor();
+                    processor.process(httpRequest, response);
+                } else {
+                    StaticResourceProcessor processor =
+                            new StaticResourceProcessor();
+                    processor.process(httpRequest, response);
+                }
                 // Close the socket
                 socket.close();
                 //check if the previous URI is a shutdown command
-                shutdown = request.getUri().equals(SHUTDOWN_COMMAND);
+                shutdown = httpRequest.getUri().equals(SHUTDOWN_COMMAND);
             } catch (Exception e) {
                 e.printStackTrace();
                 continue;

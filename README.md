@@ -63,3 +63,6 @@ Proxy-Connection: keep-alive
 
 ### ServerSocket类 ###
 &emsp;java.net.ServerSocket 类。这是服务器套接字的实现,和 Socket 不同，服务器套接字的角色是等待来自客户端的连接请求。一旦服务器套接字获得一个连接请求，它创建一个 Socket 实例来与客户端进行通信。服务器套接字的另一个重要的属性是 backlog，这是服务器套接字开始拒绝传入的请求之前，传入的连接请求的最大队列长度
+
+### Servlet ###
+servlet接口定义的是一套处理网络请求的规范，所有实现servlet的类，都需要实现它那五个方法，其中最主要的是两个生命周期方法 init()和destroy()，这是Java给的一种规范;
